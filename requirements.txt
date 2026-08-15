@@ -1,0 +1,10 @@
+﻿openai-whisper
+faster-whisper
+sentence-transformers
+chromadb
+streamlit
+python-dotenv
+pydub
+numpy
+pandas
+tqdm
