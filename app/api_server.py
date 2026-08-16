@@ -12,6 +12,9 @@ from datetime import datetime
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from dotenv import load_dotenv
+load_dotenv()
+
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
@@ -25,6 +28,7 @@ from src.retrieval.vector_store import VectorStore
 from src.rag.llm_interface import get_llm
 from src.rag.qa_pipeline import RAGPipeline
 from src.summarization.summarizer import Summarizer
+from src.audio.diarization import Diarizer
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -47,6 +51,15 @@ VECTOR_STORE = VectorStore()
 LLM = get_llm(provider="ollama", model_name="llama3.2")
 RAG_PIPELINE = RAGPipeline(vector_store=VECTOR_STORE, llm=LLM)
 SUMMARIZER = Summarizer(LLM)
+
+try:
+    DIARIZER = Diarizer()
+    DIARIZATION_ENABLED = True
+    logger.info("Speaker diarization enabled.")
+except Exception as e:
+    DIARIZER = None
+    DIARIZATION_ENABLED = False
+    logger.warning(f"Speaker diarization disabled (could not load): {e}")
 logger.info("All models loaded. API ready.")
 
 
@@ -115,6 +128,14 @@ async def upload_meeting(file: UploadFile = File(...)):
         if not raw_segments_dicts:
             MEETINGS[meeting_id] = {"status": "error", "error": "Empty or silent audio file.", "filename": file.filename}
             return {"meeting_id": meeting_id, "status": "error", "error": "Empty or silent audio file."}
+
+        if DIARIZATION_ENABLED:
+            try:
+                logger.info("Running speaker diarization...")
+                speaker_turns = DIARIZER.diarize(str(raw_path))
+                raw_segments_dicts = Diarizer.assign_speakers_to_segments(raw_segments_dicts, speaker_turns)
+            except Exception as e:
+                logger.warning(f"Diarization failed, continuing without speaker labels: {e}")
 
         logger.info("Cleaning transcript...")
         processor = TranscriptProcessor()
@@ -310,3 +331,7 @@ def export_pdf(meeting_id: str):
         media_type="application/pdf",
         headers={"Content-Disposition": f"attachment; filename={meeting_id}_minutes.pdf"},
     )
+
+
+
+
