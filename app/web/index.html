@@ -1,0 +1,101 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Meeting Memory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="mark">AI</div>
+      <div>
+        <div class="title">Meeting Memory</div>
+        <div class="subtitle">Local AI transcript assistant</div>
+      </div>
+    </div>
+
+    <div class="side-label">Upload Meeting</div>
+    <label class="upload-box" id="uploadBox">
+      <input type="file" id="fileInput" accept=".mp3,.wav,.m4a" hidden>
+      <span id="uploadText">Click to choose an audio file</span>
+    </label>
+    <button class="btn btn-primary btn-full" id="processBtn" disabled>Process Meeting</button>
+    <div id="uploadStatus" class="status-text"></div>
+
+    <div class="side-label">Meetings</div>
+    <div id="meetingList" class="meeting-list">
+      <div class="empty-text">No meetings yet</div>
+    </div>
+
+    <div class="side-label">Model Settings</div>
+    <div class="badges">
+      <span class="badge">Whisper base</span>
+      <span class="badge">MiniLM embeddings</span>
+      <span class="badge badge-accent">llama3.2 local</span>
+    </div>
+    <div class="footnote">All models run locally. No data leaves your machine.</div>
+  </aside>
+
+  <main class="main">
+    <div class="app-header">
+      <h1>AI Meeting Memory</h1>
+      <p>Upload a meeting, get instant summaries, decisions, and action items, and ask it anything.</p>
+    </div>
+
+    <div id="emptyState" class="empty-state">
+      Upload a meeting audio file from the sidebar to get started.
+    </div>
+
+    <div id="meetingView" class="meeting-view hidden">
+      <h2 id="meetingTitle"></h2>
+
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="summary">Summary</button>
+        <button class="tab-btn" data-tab="transcript">Transcript</button>
+        <button class="tab-btn" data-tab="chat">Ask Your Meeting</button>
+      </div>
+
+      <section id="tab-summary" class="tab-panel active">
+        <div class="card">
+          <h5>Overview</h5>
+          <p id="summaryOverview"></p>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <h5>Key Discussion Points</h5>
+            <ul id="summaryKeyPoints"></ul>
+          </div>
+          <div class="card">
+            <h5>Decisions</h5>
+            <ul id="summaryDecisions"></ul>
+          </div>
+        </div>
+        <h5 class="section-label">Action Items</h5>
+        <div id="summaryActionItems"></div>
+      </section>
+
+      <section id="tab-transcript" class="tab-panel">
+        <div class="card" id="transcriptContainer"></div>
+      </section>
+
+      <section id="tab-chat" class="tab-panel">
+        <div id="chatMessages" class="chat-messages"></div>
+        <div class="chat-input-row">
+          <input type="text" id="chatInput" placeholder="Ask something about this meeting...">
+          <button class="btn btn-primary" id="chatSendBtn">Send</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
