@@ -28,6 +28,7 @@ processBtn.addEventListener("click", async () => {
   processBtn.disabled = true;
   uploadStatus.textContent = "Processing... this may take a few minutes.";
   uploadStatus.className = "status-text";
+  showProcessingState();
 
   const formData = new FormData();
   formData.append("file", selectedFile);
@@ -97,6 +98,7 @@ function renderMeetingList() {
 }
 
 function renderMeeting(data) {
+  hideProcessingState();
   emptyState.classList.add("hidden");
   meetingView.classList.remove("hidden");
   meetingTitle.textContent = data.filename;
@@ -166,6 +168,9 @@ document.querySelectorAll(".tab-btn").forEach((btn) => {
     document.querySelectorAll(".tab-panel").forEach((p) => p.classList.remove("active"));
     btn.classList.add("active");
     document.getElementById("tab-" + btn.dataset.tab).classList.add("active");
+    if (btn.dataset.tab === "analytics" && currentMeetingId) {
+      loadAnalytics(currentMeetingId);
+    }
   });
 });
 
@@ -278,3 +283,146 @@ exportPdfBtn.addEventListener("click", () => {
   if (!currentMeetingId) return;
   window.open(API_BASE + "/meetings/" + currentMeetingId + "/export/pdf", "_blank");
 });
+
+let charts = { speaker: null, keyword: null, activity: null };
+
+async function loadAnalytics(meetingId) {
+  try {
+    const res = await fetch(API_BASE + "/meetings/" + meetingId + "/analytics");
+    const data = await res.json();
+    renderAnalytics(data);
+  } catch (err) {
+    console.error("Could not load analytics:", err);
+  }
+}
+
+function renderAnalytics(data) {
+  const mins = Math.floor(data.duration_seconds / 60);
+  const secs = Math.floor(data.duration_seconds % 60);
+  document.getElementById("statDuration").textContent = `${mins}:${String(secs).padStart(2, "0")}`;
+  document.getElementById("statWords").textContent = data.word_count.toLocaleString();
+  document.getElementById("statWpm").textContent = data.words_per_minute;
+
+  const chartColors = ["#7c6df2", "#ff9dc9", "#6ee7b7", "#f9d372", "#82b8f7", "#f79a82"];
+
+  if (charts.speaker) charts.speaker.destroy();
+  const speakerCtx = document.getElementById("speakerChart").getContext("2d");
+  charts.speaker = new Chart(speakerCtx, {
+    type: "doughnut",
+    data: {
+      labels: data.speaker_stats.map((s) => s.speaker),
+      datasets: [{
+        data: data.speaker_stats.map((s) => s.percentage),
+        backgroundColor: chartColors,
+        borderWidth: 0,
+      }],
+    },
+    options: {
+      maintainAspectRatio: false,
+      plugins: { legend: { position: "bottom", labels: { color: "#b4b6c2", font: { size: 11 } } } },
+    },
+  });
+
+  if (charts.keyword) charts.keyword.destroy();
+  const keywordCtx = document.getElementById("keywordChart").getContext("2d");
+  charts.keyword = new Chart(keywordCtx, {
+    type: "bar",
+    data: {
+      labels: data.top_keywords.map((k) => k.word),
+      datasets: [{
+        label: "Mentions",
+        data: data.top_keywords.map((k) => k.count),
+        backgroundColor: "#7c6df2",
+        borderRadius: 4,
+      }],
+    },
+    options: {
+      indexAxis: "y",
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: "#8b8d9a" }, grid: { color: "rgba(255,255,255,0.06)" } },
+        y: { ticks: { color: "#b4b6c2" }, grid: { display: false } },
+      },
+    },
+  });
+
+  if (charts.activity) charts.activity.destroy();
+  const activityCtx = document.getElementById("activityChart").getContext("2d");
+  charts.activity = new Chart(activityCtx, {
+    type: "line",
+    data: {
+      labels: data.activity_buckets.map((b) => b.label),
+      datasets: [{
+        label: "Words spoken",
+        data: data.activity_buckets.map((b) => b.word_count),
+        borderColor: "#7c6df2",
+        backgroundColor: "rgba(124,109,242,0.15)",
+        fill: true,
+        tension: 0.3,
+      }],
+    },
+    options: {
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: "#8b8d9a" }, grid: { display: false } },
+        y: { ticks: { color: "#8b8d9a" }, grid: { color: "rgba(255,255,255,0.06)" } },
+      },
+    },
+  });
+}
+
+
+
+
+const processingTips = [
+  "Transcribing audio with Whisper...",
+  "Identifying who spoke when...",
+  "Cleaning up the transcript...",
+  "Generating embeddings...",
+  "Summarizing key points...",
+  "Almost there...",
+];
+
+let processingTipInterval = null;
+
+function showProcessingState() {
+  emptyState.classList.add("hidden");
+  meetingView.classList.add("hidden");
+
+  let existing = document.getElementById("processingState");
+  if (!existing) {
+    existing = document.createElement("div");
+    existing.id = "processingState";
+    existing.className = "processing-state";
+    existing.innerHTML = `
+      <div class="spinner"></div>
+      <div>Processing your meeting...</div>
+      <div class="processing-tip" id="processingTipText">${processingTips[0]}</div>
+    `;
+    document.querySelector(".main").appendChild(existing);
+  }
+  existing.classList.remove("hidden");
+
+  let tipIndex = 0;
+  processingTipInterval = setInterval(() => {
+    tipIndex = (tipIndex + 1) % processingTips.length;
+    const tipEl = document.getElementById("processingTipText");
+    if (tipEl) {
+      tipEl.style.opacity = 0;
+      setTimeout(() => {
+        tipEl.textContent = processingTips[tipIndex];
+        tipEl.style.opacity = 1;
+      }, 300);
+    }
+  }, 2500);
+}
+
+function hideProcessingState() {
+  const el = document.getElementById("processingState");
+  if (el) el.classList.add("hidden");
+  if (processingTipInterval) clearInterval(processingTipInterval);
+}
+
+

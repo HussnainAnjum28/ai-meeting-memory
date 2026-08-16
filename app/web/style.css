@@ -283,3 +283,60 @@ body {
   margin-bottom: 16px;
 }
 .meeting-title-row h2 { margin: 0; }
+
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.stat-card { text-align: center; }
+.stat-value { font-size: 28px; font-weight: 700; color: var(--text); }
+.stat-label { font-size: 12px; color: var(--text-faint); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* Chart containers - fixed height fixes Chart.js sizing bugs */
+.chart-box { position: relative; height: 260px; }
+.chart-box-wide { height: 200px; }
+
+/* Sticky sidebar */
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  align-self: flex-start;
+}
+.sidebar::-webkit-scrollbar { width: 6px; }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+/* Prettier sidebar touches */
+.brand .mark {
+  background: linear-gradient(135deg, #6f5ce0, #ab6bd6);
+  color: white;
+  border: none;
+  box-shadow: 0 2px 10px rgba(124,109,242,0.35);
+}
+.meeting-item.active { box-shadow: inset 2px 0 0 var(--accent); }
+.upload-box:hover { transform: translateY(-1px); }
+
+/* Processing / empty state animation */
+.processing-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  color: var(--text-dim);
+  text-align: center;
+}
+.spinner {
+  width: 44px;
+  height: 44px;
+  border: 3px solid rgba(124,109,242,0.15);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+  margin-bottom: 18px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.processing-tip {
+  font-size: 13px;
+  color: var(--text-faint);
+  margin-top: 8px;
+  transition: opacity 300ms ease;
+}

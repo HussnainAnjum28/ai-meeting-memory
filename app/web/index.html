@@ -59,6 +59,7 @@
         <button class="tab-btn active" data-tab="summary">Summary</button>
         <button class="tab-btn" data-tab="transcript">Transcript</button>
         <button class="tab-btn" data-tab="chat">Ask Your Meeting</button>
+        <button class="tab-btn" data-tab="analytics">Analytics</button>
       </div>
 
       <section id="tab-summary" class="tab-panel active">
@@ -96,7 +97,46 @@
 
 </div>
 
+<section id="tab-analytics" class="tab-panel">
+        <div class="grid-3">
+          <div class="card stat-card">
+            <div class="stat-value" id="statDuration">-</div>
+            <div class="stat-label">Duration</div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-value" id="statWords">-</div>
+            <div class="stat-label">Total Words</div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-value" id="statWpm">-</div>
+            <div class="stat-label">Words / min</div>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <h5>Speaking Time by Speaker</h5>
+            <div class="chart-box"><canvas id="speakerChart"></canvas></div>
+          </div>
+          <div class="card">
+            <h5>Top Keywords</h5>
+            <div class="chart-box"><canvas id="keywordChart"></canvas></div>
+          </div>
+        </div>
+        <div class="card">
+          <h5>Activity Over Time</h5>
+          <div class="chart-box chart-box-wide"><canvas id="activityChart"></canvas></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
+
+
+
 

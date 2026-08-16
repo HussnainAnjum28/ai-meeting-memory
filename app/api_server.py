@@ -335,3 +335,88 @@ def export_pdf(meeting_id: str):
 
 
 
+
+
+@app.get("/meetings/{meeting_id}/analytics")
+def get_analytics(meeting_id: str):
+    """Computes analytics from the meeting transcript, including
+    per-speaker talk-time breakdown when speaker labels are available."""
+    import re
+    from collections import Counter
+
+    if meeting_id not in MEETINGS or MEETINGS[meeting_id]["status"] != "ready":
+        raise HTTPException(status_code=404, detail="Meeting not found or not ready")
+
+    segments = MEETINGS[meeting_id]["cleaned_segments"]
+
+    if not segments:
+        return {
+            "meeting_id": meeting_id, "duration_seconds": 0, "word_count": 0,
+            "words_per_minute": 0, "segment_count": 0, "top_keywords": [],
+            "activity_buckets": [], "speaker_stats": [],
+        }
+
+    duration = segments[-1]["end"] - segments[0]["start"]
+    full_text = " ".join(s["text"] for s in segments)
+    words = re.findall(r"[a-zA-Z']+", full_text.lower())
+    word_count = len(words)
+    words_per_minute = round(word_count / (duration / 60), 1) if duration > 0 else 0
+
+    stopwords = {
+        "the", "a", "an", "and", "or", "but", "is", "are", "was", "were", "be", "been",
+        "to", "of", "in", "on", "at", "for", "with", "as", "it", "this", "that", "we",
+        "i", "you", "he", "she", "they", "them", "his", "her", "our", "your", "their",
+        "have", "has", "had", "do", "does", "did", "will", "would", "could", "should",
+        "can", "so", "if", "not", "no", "yes", "just", "like", "about", "some", "there",
+        "here", "what", "when", "where", "who", "how", "why", "which", "us", "im",
+        "its", "also", "one", "get", "got", "going", "go", "really", "well", "know",
+        "think", "good", "want", "need", "up", "out", "all", "been", "s", "t", "re", "ll",
+        "ve", "d", "m",
+    }
+    meaningful_words = [w for w in words if w not in stopwords and len(w) > 2]
+    top_keywords = [{"word": w, "count": c} for w, c in Counter(meaningful_words).most_common(10)]
+
+    bucket_count = 5
+    bucket_size = duration / bucket_count if duration > 0 else 1
+    bucket_word_counts = [0] * bucket_count
+    start_time = segments[0]["start"]
+    for seg in segments:
+        seg_words = len(re.findall(r"[a-zA-Z']+", seg["text"]))
+        bucket_idx = min(int((seg["start"] - start_time) / bucket_size), bucket_count - 1)
+        bucket_word_counts[bucket_idx] += seg_words
+
+    activity_buckets = [
+        {"label": f"Part {i+1}", "word_count": bucket_word_counts[i]}
+        for i in range(bucket_count)
+    ]
+
+    speaker_time = {}
+    speaker_words = {}
+    for seg in segments:
+        speaker = seg.get("speaker") or "Unknown"
+        seg_duration = seg["end"] - seg["start"]
+        seg_words = len(re.findall(r"[a-zA-Z']+", seg["text"]))
+        speaker_time[speaker] = speaker_time.get(speaker, 0) + seg_duration
+        speaker_words[speaker] = speaker_words.get(speaker, 0) + seg_words
+
+    total_speaking_time = sum(speaker_time.values()) or 1
+    speaker_stats = [
+        {
+            "speaker": spk,
+            "seconds": round(t, 1),
+            "percentage": round((t / total_speaking_time) * 100, 1),
+            "word_count": speaker_words.get(spk, 0),
+        }
+        for spk, t in sorted(speaker_time.items(), key=lambda x: -x[1])
+    ]
+
+    return {
+        "meeting_id": meeting_id,
+        "duration_seconds": round(duration, 1),
+        "word_count": word_count,
+        "words_per_minute": words_per_minute,
+        "segment_count": len(segments),
+        "top_keywords": top_keywords,
+        "activity_buckets": activity_buckets,
+        "speaker_stats": speaker_stats,
+    }
