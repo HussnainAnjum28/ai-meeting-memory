@@ -275,3 +275,11 @@ body {
   box-shadow: 0 0 0 2px rgba(124,109,242,0.35);
   border-color: var(--accent);
 }
+
+.meeting-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.meeting-title-row h2 { margin: 0; }

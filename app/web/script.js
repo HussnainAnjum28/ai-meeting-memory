@@ -272,3 +272,9 @@ chatInput.addEventListener("keydown", (e) => {
     console.error("Could not load existing meetings:", err);
   }
 })();
+
+const exportPdfBtn = document.getElementById("exportPdfBtn");
+exportPdfBtn.addEventListener("click", () => {
+  if (!currentMeetingId) return;
+  window.open(API_BASE + "/meetings/" + currentMeetingId + "/export/pdf", "_blank");
+});
