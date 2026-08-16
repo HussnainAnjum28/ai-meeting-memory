@@ -8,3 +8,5 @@ pydub
 numpy
 pandas
 tqdm
+fastapi
+python-multipart
