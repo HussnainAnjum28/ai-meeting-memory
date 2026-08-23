@@ -443,3 +443,63 @@ themeToggle.addEventListener("click", () => {
   const current = htmlEl.getAttribute("data-theme");
   applyTheme(current === "dark" ? "light" : "dark");
 });
+
+const globalSearchInput = document.getElementById("globalSearchInput");
+const globalSearchResults = document.getElementById("globalSearchResults");
+let searchDebounceTimer = null;
+
+globalSearchInput.addEventListener("input", () => {
+  clearTimeout(searchDebounceTimer);
+  const query = globalSearchInput.value.trim();
+
+  if (!query) {
+    globalSearchResults.innerHTML = "";
+    return;
+  }
+
+  searchDebounceTimer = setTimeout(() => runGlobalSearch(query), 400);
+});
+
+async function runGlobalSearch(query) {
+  try {
+    const res = await fetch(API_BASE + "/search", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query, top_k: 5 }),
+    });
+    const data = await res.json();
+    renderGlobalSearchResults(data.results);
+  } catch (err) {
+    globalSearchResults.innerHTML = `<div class="empty-text">Search failed.</div>`;
+  }
+}
+
+function renderGlobalSearchResults(results) {
+  if (!results || results.length === 0) {
+    globalSearchResults.innerHTML = `<div class="empty-text">No matches found.</div>`;
+    return;
+  }
+
+  globalSearchResults.innerHTML = results
+    .map(
+      (r) => `
+    <div class="search-result-item" data-meeting-id="${r.meeting_id}" data-start="${r.start}">
+      <div class="sr-meeting">${escapeHtml(r.filename)} - ${formatTimestamp(r.start)}</div>
+      <div class="sr-text">${escapeHtml(r.text.slice(0, 120))}...</div>
+    </div>`
+    )
+    .join("");
+
+  document.querySelectorAll(".search-result-item").forEach((el) => {
+    el.addEventListener("click", async () => {
+      const meetingId = el.dataset.meetingId;
+      if (meetings[meetingId]) {
+        currentMeetingId = meetingId;
+        renderMeetingList();
+        renderMeeting(meetings[meetingId]);
+      } else {
+        await loadMeeting(meetingId);
+      }
+    });
+  });
+}

@@ -420,3 +420,32 @@ def get_analytics(meeting_id: str):
         "activity_buckets": activity_buckets,
         "speaker_stats": speaker_stats,
     }
+
+
+class SearchRequest(BaseModel):
+    query: str
+    top_k: int = 5
+
+
+@app.post("/search")
+def search_all_meetings(request: SearchRequest):
+    """Searches across ALL processed meetings using semantic similarity,
+    without restricting to a single meeting_id."""
+    query_embedding = RAG_PIPELINE.embed_model.encode(request.query).tolist()
+    results = VECTOR_STORE.query(query_embedding, top_k=request.top_k, meeting_id=None)
+
+    enriched_results = []
+    for r in results:
+        meta = r["metadata"]
+        mid = meta.get("meeting_id", "unknown")
+        filename = MEETINGS.get(mid, {}).get("filename", mid)
+        enriched_results.append({
+            "meeting_id": mid,
+            "filename": filename,
+            "text": r["text"],
+            "start": meta["start"],
+            "end": meta["end"],
+            "distance": r["distance"],
+        })
+
+    return {"query": request.query, "results": enriched_results}

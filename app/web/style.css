@@ -394,3 +394,31 @@ html[data-theme="light"] div[data-testid="stVerticalBlockBorderWrapper"] {
 html[data-theme="light"] .brand .mark {
   color: white;
 }
+
+.global-search-input {
+  width: 100%;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+.global-search-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(124,109,242,0.25);
+}
+.global-search-results { display: flex; flex-direction: column; gap: 8px; }
+.search-result-item {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: border-color 150ms ease-out;
+}
+.search-result-item:hover { border-color: var(--accent); }
+.search-result-item .sr-meeting { font-size: 11px; font-weight: 700; color: #ab9dfa; margin-bottom: 3px; }
+.search-result-item .sr-text { font-size: 12px; color: var(--text-dim); line-height: 1.4; }
