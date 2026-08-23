@@ -32,6 +32,8 @@ processBtn.addEventListener("click", async () => {
 
   const formData = new FormData();
   formData.append("file", selectedFile);
+  const diarizationEnabled = document.getElementById("diarizationCheckbox").checked;
+  formData.append("enable_diarization", diarizationEnabled);
 
   try {
     const res = await fetch(API_BASE + "/meetings/upload", {
@@ -503,3 +505,4 @@ function renderGlobalSearchResults(results) {
     });
   });
 }
+

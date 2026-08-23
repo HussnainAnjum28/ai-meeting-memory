@@ -15,7 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from dotenv import load_dotenv
 load_dotenv()
 
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from pydantic import BaseModel
@@ -108,7 +108,7 @@ def get_meeting(meeting_id: str):
 
 
 @app.post("/meetings/upload")
-async def upload_meeting(file: UploadFile = File(...)):
+async def upload_meeting(file: UploadFile = File(...), enable_diarization: bool = Form(True)):
     meeting_id = Path(file.filename).stem
 
     raw_path = Path("data/raw") / file.filename
@@ -129,7 +129,7 @@ async def upload_meeting(file: UploadFile = File(...)):
             MEETINGS[meeting_id] = {"status": "error", "error": "Empty or silent audio file.", "filename": file.filename}
             return {"meeting_id": meeting_id, "status": "error", "error": "Empty or silent audio file."}
 
-        if DIARIZATION_ENABLED:
+        if DIARIZATION_ENABLED and enable_diarization:
             try:
                 logger.info("Running speaker diarization...")
                 speaker_turns = DIARIZER.diarize(str(raw_path))
@@ -449,3 +449,6 @@ def search_all_meetings(request: SearchRequest):
         })
 
     return {"query": request.query, "results": enriched_results}
+
+
+

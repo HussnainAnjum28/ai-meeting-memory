@@ -25,6 +25,10 @@
       <input type="file" id="fileInput" accept=".mp3,.wav,.m4a" hidden>
       <span id="uploadText">Click to choose an audio file</span>
     </label>
+    <label class="diarization-toggle">
+      <input type="checkbox" id="diarizationCheckbox" checked>
+      <span>Enable speaker detection (slower)</span>
+    </label>
     <button class="btn btn-primary btn-full" id="processBtn" disabled>Process Meeting</button>
     <div id="uploadStatus" class="status-text"></div>
 
@@ -137,6 +141,7 @@
 <script src="script.js"></script>
 </body>
 </html>
+
 
 
 
