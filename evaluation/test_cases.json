@@ -1,0 +1,40 @@
+﻿{
+  "meeting_id": "sample",
+  "test_cases": [
+    {
+      "question": "What tasks were assigned in the meeting?",
+      "expected_keywords": ["pancake", "posters", "childcare", "resources"],
+      "type": "answerable"
+    },
+    {
+      "question": "Who is John Smith?",
+      "expected_keywords": ["student", "absent", "seven days"],
+      "type": "answerable"
+    },
+    {
+      "question": "What did they decide about Friday absences?",
+      "expected_keywords": ["pancake breakfast"],
+      "type": "answerable"
+    },
+    {
+      "question": "Why are students getting sick?",
+      "expected_keywords": ["colder", "flu season"],
+      "type": "answerable"
+    },
+    {
+      "question": "What is the budget approved for the new marketing campaign?",
+      "expected_keywords": [],
+      "type": "unanswerable"
+    },
+    {
+      "question": "Who is the CEO of the company mentioned in this meeting?",
+      "expected_keywords": [],
+      "type": "unanswerable"
+    },
+    {
+      "question": "What was decided about the office relocation?",
+      "expected_keywords": [],
+      "type": "unanswerable"
+    }
+  ]
+}

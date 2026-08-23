@@ -1,0 +1,48 @@
+[
+  {
+    "question": "What tasks were assigned in the meeting?",
+    "type": "answerable",
+    "answer": "Here are the tasks assigned in the meeting:\n\n• The teacher will send John Smith to the speaker's office after meeting with him to discuss his stress and potential help with childcare needs.\n• The speaker will look for free or low-cost resources in the community to share with John and his family.\n• The speaker will organize a pancake breakfast for students to encourage them to come to school on Fridays.\n• The speaker will put up posters with tips for not getting sick, especially during flu season.",
+    "retrieval_hit": true,
+    "answer_correct": true
+  },
+  {
+    "question": "Who is John Smith?",
+    "type": "answerable",
+    "answer": "John Smith is a student who has been absent from school for seven days, and is currently experiencing stress due to helping his parents care for his younger siblings.",
+    "retrieval_hit": true,
+    "answer_correct": true
+  },
+  {
+    "question": "What did they decide about Friday absences?",
+    "type": "answerable",
+    "answer": "They decided to try a pancake breakfast to encourage students to come on Fridays, and also to put up posters with tips for not getting sick since it's almost flu season.",
+    "retrieval_hit": true,
+    "answer_correct": true
+  },
+  {
+    "question": "Why are students getting sick?",
+    "type": "answerable",
+    "answer": "It seems that students are getting sick due to the approaching flu season. The meeting discussion mentions that it's \"almost flu season\" and that students have been coming to the office with symptoms like sniffling and coughing. Additionally, it's suggested that the colder weather outside might be contributing to the increase in illnesses.",
+    "retrieval_hit": true,
+    "answer_correct": true
+  },
+  {
+    "question": "What is the budget approved for the new marketing campaign?",
+    "type": "unanswerable",
+    "answer": "I couldn't find any information about a budget being approved for a new marketing campaign in this meeting's transcript.",
+    "correctly_refused": true
+  },
+  {
+    "question": "Who is the CEO of the company mentioned in this meeting?",
+    "type": "unanswerable",
+    "answer": "There is no mention of a CEO or a company in this meeting's transcript.",
+    "correctly_refused": false
+  },
+  {
+    "question": "What was decided about the office relocation?",
+    "type": "unanswerable",
+    "answer": "I couldn't find any mention of the office relocation in the provided meeting transcript.",
+    "correctly_refused": true
+  }
+]
