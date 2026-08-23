@@ -573,8 +573,11 @@ async function handleRecordingStop() {
   }
 
   const blob = new Blob(recordedChunks, { type: "audio/webm" });
-  const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-  const filename = `live-meeting-${timestamp}.webm`;
+  const now = new Date();
+  const dateLabel = now.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  const timeLabel = now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  const safeLabel = `Live Meeting - ${dateLabel} ${timeLabel}`.replace(/[:,]/g, "").replace(/\s+/g, "_");
+  const filename = `${safeLabel}.webm`;
   const file = new File([blob], filename, { type: "audio/webm" });
 
   uploadStatus.textContent = "Processing recorded meeting... this may take a few minutes.";
@@ -608,3 +611,4 @@ async function handleRecordingStop() {
     hideProcessingState();
   }
 }
+
