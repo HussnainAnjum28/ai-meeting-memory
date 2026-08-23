@@ -37,7 +37,7 @@ class OllamaLLM(LLMInterface):
                     "model": self.model_name,
                     "prompt": prompt,
                     "stream": False,
-                    "options": {"temperature": temperature},
+                    "options": {"temperature": temperature, "repeat_penalty": 1.3, "repeat_last_n": 64, "num_predict": 300},
                 },
                 timeout=120,
             )
@@ -69,3 +69,4 @@ if __name__ == "__main__":
     print("Sending test prompt to Ollama...")
     result = llm.generate("Say hello in one short sentence.")
     print(f"\nResponse: {result}")
+

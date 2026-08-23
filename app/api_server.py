@@ -46,10 +46,10 @@ MEETINGS: dict = {}
 
 logger.info("Loading models (this happens once at server startup)...")
 TRANSCRIBER = Transcriber(model_size="base", device="cpu", compute_type="int8")
-EMBEDDER = Embedder(model_name="all-MiniLM-L6-v2")
+EMBEDDER = Embedder(model_name="paraphrase-multilingual-MiniLM-L12-v2")
 VECTOR_STORE = VectorStore()
 LLM = get_llm(provider="ollama", model_name="llama3.2")
-RAG_PIPELINE = RAGPipeline(vector_store=VECTOR_STORE, llm=LLM)
+RAG_PIPELINE = RAGPipeline(vector_store=VECTOR_STORE, llm=LLM, embedding_model_name="paraphrase-multilingual-MiniLM-L12-v2")
 SUMMARIZER = Summarizer(LLM)
 
 try:
@@ -449,6 +449,8 @@ def search_all_meetings(request: SearchRequest):
         })
 
     return {"query": request.query, "results": enriched_results}
+
+
 
 
 

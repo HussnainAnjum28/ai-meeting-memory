@@ -35,7 +35,7 @@ class MeetingSummary:
     action_items: List[ActionItem] = field(default_factory=list)
 
 
-SUMMARY_PROMPT_TEMPLATE = """You are analyzing a meeting transcript. Based ONLY on the transcript below, produce a structured summary.
+SUMMARY_PROMPT_TEMPLATE = """You are analyzing a meeting transcript, which may be in English, Urdu, or a mix of both. Based ONLY on the transcript below, produce a structured summary.\n\nIMPORTANT: Always write your summary in English, regardless of what language the transcript is in.
 
 Respond with ONLY valid JSON (no markdown, no extra text) in exactly this format:
 {{
@@ -181,3 +181,4 @@ if __name__ == "__main__":
         print(f"  Assigned to: {a.assigned_to}")
         print(f"  Deadline: {a.deadline}")
         print(f"  Evidence: {a.evidence}")
+
