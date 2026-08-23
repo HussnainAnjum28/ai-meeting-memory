@@ -11,3 +11,4 @@ tqdm
 fastapi
 python-multipart
 fpdf2
+pytest
