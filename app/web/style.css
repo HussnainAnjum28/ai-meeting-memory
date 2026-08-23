@@ -25,6 +25,7 @@ body {
 .app {
   display: flex;
   min-height: 100vh;
+  align-items: flex-start;
 }
 
 /* Sidebar */
@@ -300,6 +301,11 @@ body {
   height: 100vh;
   overflow-y: auto;
   align-self: flex-start;
+  flex-shrink: 0;
+}
+.main {
+  height: 100vh;
+  overflow-y: auto;
 }
 .sidebar::-webkit-scrollbar { width: 6px; }
 .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
@@ -340,3 +346,23 @@ body {
   margin-top: 8px;
   transition: opacity 300ms ease;
 }
+
+/* Force charts to respect container bounds */
+.chart-box { overflow: hidden; }
+.chart-box canvas {
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Fix Chart.js infinite-growth bug inside grid/flex containers */
+.grid-2, .grid-3 { min-height: 0; }
+.card { min-width: 0; min-height: 0; }
+.chart-box { position: relative; width: 100%; height: 260px !important; min-height: 260px; max-height: 260px; overflow: hidden; }
+.chart-box-wide { position: relative; width: 100%; height: 200px !important; min-height: 200px; max-height: 200px; overflow: hidden; }
+.chart-box canvas, .chart-box-wide canvas { position: absolute !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important; }
+
+
+
