@@ -109,6 +109,14 @@ def get_meeting(meeting_id: str):
 
 @app.post("/meetings/upload")
 async def upload_meeting(file: UploadFile = File(...), enable_diarization: bool = Form(True)):
+    ALLOWED_EXTENSIONS = {".mp3", ".wav", ".m4a", ".webm", ".ogg"}
+    file_ext = Path(file.filename).suffix.lower()
+    if file_ext not in ALLOWED_EXTENSIONS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported file type '{file_ext}'. Please upload an MP3, WAV, M4A, or WEBM audio file.",
+        )
+
     meeting_id = Path(file.filename).stem
 
     raw_path = Path("data/raw") / file.filename
@@ -449,6 +457,7 @@ def search_all_meetings(request: SearchRequest):
         })
 
     return {"query": request.query, "results": enriched_results}
+
 
 
 

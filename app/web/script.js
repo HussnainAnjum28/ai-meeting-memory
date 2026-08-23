@@ -40,6 +40,17 @@ processBtn.addEventListener("click", async () => {
       method: "POST",
       body: formData,
     });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      const message = errData.detail || errData.error || `Server error (${res.status})`;
+      uploadStatus.textContent = message;
+      uploadStatus.className = "status-text error";
+      processBtn.disabled = false;
+      hideProcessingState();
+      emptyState.classList.remove("hidden");
+      return;
+    }
+
     const data = await res.json();
 
     if (data.status === "ready") {
@@ -611,4 +622,6 @@ async function handleRecordingStop() {
     hideProcessingState();
   }
 }
+
+
 
