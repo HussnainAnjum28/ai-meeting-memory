@@ -36,15 +36,16 @@ class QAResult:
     question: str
 
 
-RAG_PROMPT_TEMPLATE = """You are an assistant that answers questions about a meeting using ONLY the transcript excerpts provided below. 
+RAG_PROMPT_TEMPLATE = """You are a professional meeting assistant. Your job is to help the user understand what was discussed in this meeting by answering their questions clearly and confidently, using only the transcript excerpts provided below.
 
-Rules:
-- Answer using only the information in the excerpts.
-- If the answer is not present in the excerpts, say clearly: "I could not find this information in the meeting."
-- Do not invent names, deadlines, or facts that are not stated.
-- Be concise and direct.
+Guidelines:
+- Write in a natural, helpful, professional tone, as a knowledgeable colleague would.
+- Base your answer only on the information in the excerpts below. Do not invent names, deadlines, decisions, or any fact not stated there.
+- If the excerpts do not contain the answer, say so plainly: "I couldn't find that in this meeting's transcript." Do not guess.
+- Be concise but complete. Use short paragraphs or a bulleted list if it helps clarity.
+- Do not mention "the excerpts" or "the transcript excerpts" in your answer, just answer as if you attended the meeting.
 
-Transcript excerpts:
+Meeting transcript excerpts:
 {context}
 
 Question: {question}
@@ -72,6 +73,26 @@ class RAGPipeline:
         logger.info(f"Loading query embedding model '{embedding_model_name}'...")
         self.embed_model = SentenceTransformer(embedding_model_name)
 
+    GREETINGS = {
+        "hi", "hello", "hey", "hiya", "yo", "greetings",
+        "good morning", "good afternoon", "good evening",
+    }
+    THANKS = {"thanks", "thank you", "thanks!", "thank you!", "ty", "appreciate it"}
+    FAREWELLS = {"bye", "goodbye", "see you", "see ya", "bye bye"}
+
+    def _maybe_handle_smalltalk(self, question: str) -> Optional[str]:
+        """Handles greetings/thanks/farewells directly, skipping retrieval
+        for a faster, more natural response on simple chit-chat."""
+        normalized = question.strip().lower().rstrip("!.?")
+
+        if normalized in self.GREETINGS:
+            return "Hello! I'm ready to help with this meeting. Ask me anything about what was discussed, decisions made, or action items."
+        if normalized in self.THANKS:
+            return "You're welcome! Let me know if you have any other questions about this meeting."
+        if normalized in self.FAREWELLS:
+            return "Goodbye! Feel free to come back anytime you have questions about this meeting."
+        return None
+
     def answer(self, question: str, meeting_id: Optional[str] = None) -> QAResult:
         """
         Answers a question using retrieval-augmented generation.
@@ -85,6 +106,10 @@ class RAGPipeline:
         """
         if not question or not question.strip():
             raise ValueError("Question cannot be empty.")
+
+        smalltalk_reply = self._maybe_handle_smalltalk(question)
+        if smalltalk_reply is not None:
+            return QAResult(answer=smalltalk_reply, evidence=[], question=question)
 
         # 1. Embed the question
         query_embedding = self.embed_model.encode(question).tolist()
@@ -160,3 +185,5 @@ if __name__ == "__main__":
     for e in result.evidence:
         print(f"\n[{e.start:.1f}s-{e.end:.1f}s] (distance: {e.distance:.4f})")
         print(e.text)
+
+
