@@ -506,3 +506,105 @@ function renderGlobalSearchResults(results) {
   });
 }
 
+
+// --- Live Recording ---
+let mediaRecorder = null;
+let recordedChunks = [];
+let recordingStartTime = null;
+let recordingTimerInterval = null;
+
+const recordBtn = document.getElementById("recordBtn");
+const recordingStatus = document.getElementById("recordingStatus");
+const recordingTimer = document.getElementById("recordingTimer");
+
+recordBtn.addEventListener("click", async () => {
+  if (mediaRecorder && mediaRecorder.state === "recording") {
+    stopRecording();
+  } else {
+    await startRecording();
+  }
+});
+
+async function startRecording() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    recordedChunks = [];
+
+    mediaRecorder = new MediaRecorder(stream);
+    mediaRecorder.ondataavailable = (e) => {
+      if (e.data.size > 0) recordedChunks.push(e.data);
+    };
+    mediaRecorder.onstop = () => {
+      stream.getTracks().forEach((track) => track.stop());
+      handleRecordingStop();
+    };
+
+    mediaRecorder.start();
+    recordingStartTime = Date.now();
+
+    recordBtn.textContent = "End Meeting";
+    recordingStatus.classList.remove("hidden");
+    recordingTimerInterval = setInterval(updateRecordingTimer, 1000);
+  } catch (err) {
+    alert("Could not access microphone: " + err.message);
+  }
+}
+
+function stopRecording() {
+  if (mediaRecorder && mediaRecorder.state === "recording") {
+    mediaRecorder.stop();
+  }
+  clearInterval(recordingTimerInterval);
+  recordBtn.textContent = "Start Meeting";
+  recordingStatus.classList.add("hidden");
+}
+
+function updateRecordingTimer() {
+  const elapsed = Math.floor((Date.now() - recordingStartTime) / 1000);
+  const mins = Math.floor(elapsed / 60);
+  const secs = elapsed % 60;
+  recordingTimer.textContent = `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+}
+
+async function handleRecordingStop() {
+  if (recordedChunks.length === 0) {
+    alert("No audio was recorded.");
+    return;
+  }
+
+  const blob = new Blob(recordedChunks, { type: "audio/webm" });
+  const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+  const filename = `live-meeting-${timestamp}.webm`;
+  const file = new File([blob], filename, { type: "audio/webm" });
+
+  uploadStatus.textContent = "Processing recorded meeting... this may take a few minutes.";
+  uploadStatus.className = "status-text";
+  showProcessingState();
+
+  const formData = new FormData();
+  formData.append("file", file);
+  const diarizationEnabled = document.getElementById("diarizationCheckbox").checked;
+  formData.append("enable_diarization", diarizationEnabled);
+
+  try {
+    const res = await fetch(API_BASE + "/meetings/upload", {
+      method: "POST",
+      body: formData,
+    });
+    const data = await res.json();
+
+    if (data.status === "ready") {
+      uploadStatus.textContent = "Live meeting processed successfully.";
+      uploadStatus.className = "status-text success";
+      await loadMeeting(data.meeting_id);
+    } else {
+      uploadStatus.textContent = "Failed: " + (data.error || "unknown error");
+      uploadStatus.className = "status-text error";
+      hideProcessingState();
+    }
+  } catch (err) {
+    uploadStatus.textContent = "Request failed: " + err.message;
+    uploadStatus.className = "status-text error";
+    hideProcessingState();
+  }
+}
