@@ -426,3 +426,20 @@ function hideProcessingState() {
 }
 
 
+
+const themeToggle = document.getElementById("themeToggle");
+const htmlEl = document.documentElement;
+
+function applyTheme(theme) {
+  htmlEl.setAttribute("data-theme", theme);
+  themeToggle.textContent = theme === "dark" ? "Switch to Light" : "Switch to Dark";
+  localStorage.setItem("theme", theme);
+}
+
+const savedTheme = localStorage.getItem("theme") || "dark";
+applyTheme(savedTheme);
+
+themeToggle.addEventListener("click", () => {
+  const current = htmlEl.getAttribute("data-theme");
+  applyTheme(current === "dark" ? "light" : "dark");
+});

@@ -366,3 +366,31 @@ body {
 
 
 
+
+/* Light theme overrides */
+html[data-theme="light"] {
+  --bg: #f5f6fa;
+  --panel: #ffffff;
+  --sidebar: #ffffff;
+  --border: rgba(0,0,0,0.08);
+  --border-hover: rgba(0,0,0,0.16);
+  --text: #1a1c29;
+  --text-dim: #55586b;
+  --text-faint: #8a8d9e;
+  --accent: #6f5ce0;
+  --accent-hover: #5d4bd0;
+  --accent-soft: rgba(111,92,224,0.08);
+}
+html[data-theme="light"] .app-header {
+  border-bottom-color: rgba(0,0,0,0.08);
+}
+html[data-theme="light"] .sidebar {
+  box-shadow: 1px 0 0 rgba(0,0,0,0.04);
+}
+html[data-theme="light"] .card,
+html[data-theme="light"] div[data-testid="stVerticalBlockBorderWrapper"] {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+html[data-theme="light"] .brand .mark {
+  color: white;
+}
