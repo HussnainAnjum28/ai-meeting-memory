@@ -17,7 +17,8 @@ load_dotenv()
 
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import Response
+from fastapi.responses import Response, FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from src.audio.transcription import Transcriber
@@ -463,3 +464,10 @@ def search_all_meetings(request: SearchRequest):
 
 
 
+
+
+
+# Serve the frontend (HTML/CSS/JS) as static files.
+# Mounted last so it does not shadow the API routes above.
+WEB_DIR = Path(__file__).resolve().parent / "web"
+app.mount("/", StaticFiles(directory=str(WEB_DIR), html=True), name="frontend")

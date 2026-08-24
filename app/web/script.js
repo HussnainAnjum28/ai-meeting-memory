@@ -1,4 +1,4 @@
-﻿const API_BASE = "http://localhost:8000";
+﻿const API_BASE = window.location.origin;
 
 let currentMeetingId = null;
 let meetings = {};
@@ -622,6 +622,7 @@ async function handleRecordingStop() {
     hideProcessingState();
   }
 }
+
 
 
 
