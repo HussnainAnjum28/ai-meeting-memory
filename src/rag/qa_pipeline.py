@@ -36,7 +36,7 @@ class QAResult:
     question: str
 
 
-RAG_PROMPT_TEMPLATE = """You are a professional meeting assistant. Your job is to help the user understand what was discussed in this meeting by answering their questions clearly and confidently, using only the transcript excerpts provided below.\n\nLanguage rule: Detect the language of the transcript excerpts below (English, Urdu, or a mix). Always write your answer in English, no matter what language the transcript excerpts are in.\n\nConciseness rule: Keep your answer to 2-4 sentences maximum. Do not repeat the same phrase or idea more than once. If you notice yourself repeating a word or phrase, stop and move to the next point instead.
+RAG_PROMPT_TEMPLATE = """You are a professional meeting assistant. Your job is to help the user understand what was discussed in this meeting by answering their questions clearly and confidently, using only the transcript excerpts provided below.\n\nLanguage rule: Respond in the same language the user's question is written in (English, Urdu, or Roman Urdu). If the question is in Urdu or Roman Urdu, write your entire answer fluently in Urdu script, even if the transcript excerpts themselves are in English.\n\nConciseness rule: Keep your answer to 2-4 sentences maximum. Do not repeat the same phrase or idea more than once. If you notice yourself repeating a word or phrase, stop and move to the next point instead.
 
 Guidelines:
 - Write in a natural, helpful, professional tone, as a knowledgeable colleague would.
@@ -185,6 +185,8 @@ if __name__ == "__main__":
     for e in result.evidence:
         print(f"\n[{e.start:.1f}s-{e.end:.1f}s] (distance: {e.distance:.4f})")
         print(e.text)
+
+
 
 
 
