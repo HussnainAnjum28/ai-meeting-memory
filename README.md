@@ -5,7 +5,7 @@
 [![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688.svg)](https://fastapi.tiangolo.com/)
 [![Whisper](https://img.shields.io/badge/Speech--to--Text-Whisper-orange.svg)](https://github.com/openai/whisper)
-[![Ollama](https://img.shields.io/badge/LLM-Ollama%20%2F%20Llama%203.2-black.svg)](https://ollama.com/)
+[![Groq](https://img.shields.io/badge/LLM-Groq%20%2F%20GPT--OSS--20B-black.svg)](https://groq.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 ---
@@ -34,7 +34,7 @@ It is built as a full local AI pipeline: **Speech-to-Text → NLP Cleaning → C
 | 📝 **Speech-to-Text** | Local transcription via OpenAI Whisper (`faster-whisper`), with timestamps |
 | 🗣️ **Speaker Diarization** | Identifies "who spoke when" using `pyannote.audio` (optional, toggle-able for speed) |
 | 🧹 **Transcript Cleaning** | Removes filler artifacts, repeated words, and normalizes punctuation |
-| 📋 **AI Summarization** | Structured overview, key points, decisions, and action items via a local LLM (Ollama + Llama 3.2) |
+| 📋 **AI Summarization** | Structured overview, key points, decisions, and action items via a cloud LLM (Groq + GPT-OSS-20B) |
 | 🔎 **RAG-based Q&A** | Ask natural-language questions about a meeting; answers are grounded in retrieved transcript evidence, with an explicit "I don't know" fallback to reduce hallucination |
 | 🌐 **Cross-Meeting Search** | Semantically search across every processed meeting at once |
 | 📊 **Meeting Analytics** | Talk-time by speaker, keyword frequency, and activity-over-time charts |
@@ -81,7 +81,7 @@ Embedding Generation (sentence-transformers)
         ▼
 Vector Database (ChromaDB)
         │
-        ├──────────────► Summarization (Ollama / Llama 3.2) ──► Structured Summary + PDF Export
+        ├──────────────► Summarization (Groq / GPT-OSS-20B) ──► Structured Summary + PDF Export
         │
         ▼
 Retriever ──► RAG Pipeline ──► LLM ──► Answer + Evidence (Chat UI)
@@ -99,7 +99,7 @@ The system is split into a **FastAPI backend** (`app/api_server.py`) that expose
 | Speaker Diarization | [pyannote.audio](https://github.com/pyannote/pyannote-audio) |
 | Embeddings | [sentence-transformers](https://www.sbert.net/) (`all-MiniLM-L6-v2`, or multilingual variant) |
 | Vector Database | [ChromaDB](https://www.trychroma.com/) |
-| LLM (Summarization & Q&A) | [Ollama](https://ollama.com/) running [Llama 3.2](https://ollama.com/library/llama3.2) (local, free) |
+| LLM (Summarization & Q&A) | [Groq](https://groq.com/) API running GPT-OSS-20B (cloud, free tier, no card required) |
 | Backend | [FastAPI](https://fastapi.tiangolo.com/) + Uvicorn |
 | Frontend | Vanilla HTML / CSS / JavaScript + [Chart.js](https://www.chartjs.org/) |
 | PDF Generation | [fpdf2](https://pyfpdf.github.io/fpdf2/) |
@@ -113,7 +113,7 @@ The system is split into a **FastAPI backend** (`app/api_server.py`) that expose
 ### Prerequisites
 
 - **Python 3.12+**
-- **[Ollama](https://ollama.com/download)** installed and running
+- A free **[Groq](https://console.groq.com)** API key
 - **[FFmpeg](https://www.gyan.dev/ffmpeg/builds/)** installed and available on your system PATH
 - (Optional, for speaker diarization) A free **[Hugging Face](https://huggingface.co/join)** account and access token, with the license accepted on:
   - [pyannote/speaker-diarization-3.1](https://huggingface.co/pyannote/speaker-diarization-3.1)
@@ -145,13 +145,8 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 4. Pull the LLM model via Ollama
 
-```bash
-ollama pull llama3.2
-```
-
-### 5. Configure environment variables
+### 4. Configure environment variables
 
 Copy `.env.example` to `.env` and fill in your Hugging Face token (only required if you want speaker diarization):
 
@@ -170,24 +165,17 @@ HF_TOKEN=your_huggingface_token_here
 
 The application has two parts that need to run at the same time: the backend API and the frontend.
 
-### 1. Start the backend (Terminal 1)
+### 1. Start the app
 
 ```bash
 uvicorn app.api_server:app --reload --port 8000
 ```
 
-Wait until the terminal shows:
+The backend also serves the frontend directly, so this single command runs the whole application. Wait until the terminal shows:
 
-### 2. Start the frontend (Terminal 2)
+### 2. Open the app
 
-```bash
-cd app/web
-python -m http.server 3000
-```
-
-### 3. Open the app
-
-Go to [http://localhost:3000](http://localhost:3000) in your browser.
+Go to [http://localhost:8000](http://localhost:8000) in your browser.
 
 From there you can:
 - **Upload** a meeting audio file (`.mp3`, `.wav`, `.m4a`, `.webm`), or
@@ -260,4 +248,8 @@ This project is licensed under the MIT License — see the [LICENSE](LICENSE) fi
 ## 🙋 Author
 
 Built by [Hussnain Anjum](https://github.com/HussnainAnjum28) as an AI/ML portfolio project, demonstrating a full local, privacy-preserving AI pipeline: speech recognition, NLP, embeddings, vector search, RAG, and LLM-based generation.
+
+
+
+
 

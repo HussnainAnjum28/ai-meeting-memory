@@ -54,7 +54,7 @@ def run_evaluation(test_cases_path: str):
 
     print("Loading pipeline (this may take a minute)...")
     store = VectorStore()
-    llm = get_llm(provider="ollama", model_name="llama3.2")
+    llm = get_llm(provider="groq")
     pipeline = RAGPipeline(vector_store=store, llm=llm)
 
     results = []
@@ -144,4 +144,5 @@ def run_evaluation(test_cases_path: str):
 if __name__ == "__main__":
     test_path = sys.argv[1] if len(sys.argv) > 1 else "evaluation/test_cases.json"
     run_evaluation(test_path)
+
 

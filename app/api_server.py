@@ -50,7 +50,7 @@ logger.info("Loading models (this happens once at server startup)...")
 TRANSCRIBER = Transcriber(model_size="base", device="cpu", compute_type="int8")
 EMBEDDER = Embedder(model_name="paraphrase-multilingual-MiniLM-L12-v2")
 VECTOR_STORE = VectorStore()
-LLM_PROVIDER = os.getenv("LLM_PROVIDER", "ollama")
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "groq")
 LLM_MODEL = os.getenv("LLM_MODEL_NAME") or None
 LLM = get_llm(provider=LLM_PROVIDER, model_name=LLM_MODEL)
 RAG_PIPELINE = RAGPipeline(vector_store=VECTOR_STORE, llm=LLM, embedding_model_name="paraphrase-multilingual-MiniLM-L12-v2")
@@ -474,5 +474,6 @@ def search_all_meetings(request: SearchRequest):
 # Mounted last so it does not shadow the API routes above.
 WEB_DIR = Path(__file__).resolve().parent / "web"
 app.mount("/", StaticFiles(directory=str(WEB_DIR), html=True), name="frontend")
+
 
 
