@@ -1,14 +1,14 @@
-﻿openai-whisper
-faster-whisper
+﻿faster-whisper
 sentence-transformers
 chromadb
-streamlit
 python-dotenv
 pydub
 numpy
 pandas
 tqdm
 fastapi
+uvicorn
+requests
 python-multipart
 fpdf2
 pytest

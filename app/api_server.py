@@ -47,13 +47,15 @@ app.add_middleware(
 MEETINGS: dict = {}
 
 logger.info("Loading models (this happens once at server startup)...")
-TRANSCRIBER = Transcriber(model_size="base", device="cpu", compute_type="int8")
-EMBEDDER = Embedder(model_name="paraphrase-multilingual-MiniLM-L12-v2")
+WHISPER_MODEL_SIZE = os.getenv("WHISPER_MODEL_SIZE", "base")
+TRANSCRIBER = Transcriber(model_size=WHISPER_MODEL_SIZE, device="cpu", compute_type="int8")
+EMBEDDING_MODEL_NAME = os.getenv("EMBEDDING_MODEL", "paraphrase-multilingual-MiniLM-L12-v2")
+EMBEDDER = Embedder(model_name=EMBEDDING_MODEL_NAME)
 VECTOR_STORE = VectorStore()
 LLM_PROVIDER = os.getenv("LLM_PROVIDER", "groq")
 LLM_MODEL = os.getenv("LLM_MODEL_NAME") or None
 LLM = get_llm(provider=LLM_PROVIDER, model_name=LLM_MODEL)
-RAG_PIPELINE = RAGPipeline(vector_store=VECTOR_STORE, llm=LLM, embedding_model_name="paraphrase-multilingual-MiniLM-L12-v2")
+RAG_PIPELINE = RAGPipeline(vector_store=VECTOR_STORE, llm=LLM, embedding_model_name=EMBEDDING_MODEL_NAME)
 SUMMARIZER = Summarizer(LLM)
 
 try:
@@ -474,6 +476,9 @@ def search_all_meetings(request: SearchRequest):
 # Mounted last so it does not shadow the API routes above.
 WEB_DIR = Path(__file__).resolve().parent / "web"
 app.mount("/", StaticFiles(directory=str(WEB_DIR), html=True), name="frontend")
+
+
+
 
 
 

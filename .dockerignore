@@ -1,0 +1,16 @@
+﻿venv/
+__pycache__/
+*.pyc
+.env
+.git/
+.gitignore
+data/raw/*
+data/processed/*
+data/vector_store/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/vector_store/.gitkeep
+screenshots/
+tests/
+evaluation/
+.pytest_cache/
